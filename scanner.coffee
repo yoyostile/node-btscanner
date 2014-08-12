@@ -19,13 +19,14 @@ noble.on 'stateChange', (state) ->
 
 
 noble.on 'discover', (peripheral) ->
-  s = new Date().toString() + ';'
-  s += peripheral.uuid + ';'
-  s += peripheral.advertisement.localName + ';'
-  s += JSON.stringify(peripheral.advertisement.serviceUuids) + ';'
-  s += peripheral.advertisement.txPowerLevel + ';'
-  s += peripheral.rssi + ';'
-  s += peripheral.advertisement.manufacturerData.toString('hex') + '\n'
-  fs.appendFile PATH, s, (err) ->
+  arr = []
+  arr.push new Date().toString()
+  arr.push peripheral.uuid
+  arr.push peripheral.advertisement.localName
+  arr.push JSON.stringify(peripheral.advertisement.serviceUuids)
+  arr.push peripheral.advertisement.txPowerLevel
+  arr.push peripheral.rssi
+  arr.push peripheral.advertisement.manufacturerData.toString('hex')
+  fs.appendFile PATH, arr.join(';') + '\n', (err) ->
     throw err if err
-    console.log s
+    console.log arr.join(';')
