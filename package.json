@@ -1,0 +1,10 @@
+{
+  "name": "node-btscanner",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {
+    "coffee-script": "~1.7.1",
+    "noble": "~0.3.4"
+  }
+}
