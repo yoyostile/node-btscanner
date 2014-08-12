@@ -2,7 +2,7 @@ fs = require 'fs'
 noble = require 'noble'
 
 FIELDS = 'DATE;UUID;LOCALNAME;SERVICEUUIDS;TXPOWERLEVEL;RSSI;MANUFACTURERDATA\n'
-PATH = 'scan.log'
+PATH = 'scan.csv'
 
 fs.exists PATH, (exists) ->
   unless exists
