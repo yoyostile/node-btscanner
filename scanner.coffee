@@ -1,8 +1,13 @@
 fs = require 'fs'
 noble = require 'noble'
+Client = require('node-rest-client').Client
+
+client = new Client()
 
 FIELDS = 'DATE;UUID;LOCALNAME;SERVICEUUIDS;TXPOWERLEVEL;RSSI;MANUFACTURERDATA\n'
 PATH = 'scan.csv'
+
+logEntries = []
 
 fs.exists PATH, (exists) ->
   unless exists
@@ -19,14 +24,33 @@ noble.on 'stateChange', (state) ->
 
 
 noble.on 'discover', (peripheral) ->
-  arr = []
-  arr.push new Date().toString()
-  arr.push peripheral.uuid
-  arr.push peripheral.advertisement.localName
-  arr.push JSON.stringify(peripheral.advertisement.serviceUuids)
-  arr.push peripheral.advertisement.txPowerLevel
-  arr.push peripheral.rssi
-  arr.push peripheral.advertisement.manufacturerData.toString('hex')
-  fs.appendFile PATH, arr.join(';') + '\n', (err) ->
+  obj = {}
+  obj.date = new Date().toString()
+  obj.uuid = peripheral.uuid
+  obj.localName = peripheral.advertisement.localName
+  obj.serviceUuids = JSON.stringify(peripheral.advertisement.serviceUuids)
+  obj.txPowerLevel = peripheral.advertisement.txPowerLevel
+  obj.rssi = peripheral.rssi
+  obj.manufacturerData = peripheral.advertisement.manufacturerData.toString('hex')
+  logEntries.push obj
+  appendix = ''
+  for key in Object.keys(obj) 
+    appendix += obj[key] + ';'
+  fs.appendFile PATH, appendix + '\n', (err) ->
     throw err if err
-    console.log arr.join(';')
+    console.log appendix
+
+  if logEntries.length > 100
+    postEntries()
+
+
+postEntries = ->
+  tmp = logEntries
+  logEntries = []
+  args = {
+    data: { entries: tmp },
+    headers: { 'Content-Type': 'application/json' }
+  }
+
+  client.post 'http://requestb.in/18gc4kl1', args, (data, res) ->
+    console.log 'Push'  
