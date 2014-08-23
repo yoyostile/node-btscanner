@@ -1,0 +1,26 @@
+input {
+  file {
+    path => "/Users/yoyostile/Development/node-btscanner/scan.csv"
+  }
+}
+
+filter {
+  csv {
+    separator => ";"
+    quote_char => "'"
+    columns => [ "DATE", "UUID", "LOCALNAME", "SERVICEUUIDS", "TXPOWERLEVEL", "RSSI", "MANUFACTURERDATA" ]
+  }
+  date {
+    match => [ "timestamp", "DD/MMM/YYYY:HH:MM:SS" ]
+  }
+  mutate {
+    convert => [ "RSSI", "integer" ]
+  }
+}
+
+output {
+  elasticsearch {
+    host => "yoyostile.de"
+    protocol => http
+  }
+}
